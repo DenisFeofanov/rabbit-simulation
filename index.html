@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rabbit Simulation</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="chart.js"></script>
   </head>
   <body>
     <div class="container">
@@ -37,7 +38,12 @@
         </div>
         <button id="restartBtn">Restart Simulation</button>
       </div>
-      <canvas id="simulationCanvas"></canvas>
+      <div class="simulation-area">
+        <canvas id="simulationCanvas"></canvas>
+        <div class="graph-container">
+          <canvas id="generationGraph"></canvas>
+        </div>
+      </div>
       <div id="stats"></div>
     </div>
     <script src="script.js"></script>

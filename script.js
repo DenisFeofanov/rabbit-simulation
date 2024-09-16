@@ -206,6 +206,8 @@ function addResource(type, x = null, y = null) {
   }
 }
 
+let chart;
+
 function initSimulation() {
   canvas.width = BOT_SIZE * FIELD_SIZE;
   canvas.height = BOT_SIZE * FIELD_SIZE;
@@ -235,6 +237,32 @@ function initSimulation() {
   generation = 0;
   timelife = 0;
   generationLifetimes = [];
+
+  // Initialize the chart
+  const ctx = document.getElementById("generationGraph").getContext("2d");
+  chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: "Generation Lifetime",
+          data: [],
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
 }
 
 function drawGrid() {
@@ -273,6 +301,11 @@ function updateStats() {
 
 function nextGeneration() {
   generationLifetimes.push(timelife);
+
+  // Update the chart
+  chart.data.labels.push(generation);
+  chart.data.datasets[0].data.push(timelife);
+  chart.update();
 
   const survivors = bots.filter(b => !b.dead).slice(0, SURVIVORS);
   if (survivors.length === 0) {
@@ -327,7 +360,6 @@ function nextGeneration() {
 function endSimulation() {
   cancelAnimationFrame(animationFrameId);
   console.log("Simulation ended after", generation, "generations");
-  displayGenerationGraph();
 }
 
 let animationFrameId;
@@ -356,12 +388,6 @@ function updateSimulation() {
   }
 
   animationFrameId = requestAnimationFrame(updateSimulation);
-}
-
-function displayGenerationGraph() {
-  // This is a placeholder for graph generation
-  // You might want to use a library like Chart.js to create an actual graph
-  console.log("Generation Lifetimes:", generationLifetimes);
 }
 
 // Add event listeners for the input fields

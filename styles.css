@@ -14,6 +14,16 @@ body {
   align-items: center;
 }
 
+.simulation-area {
+  display: flex;
+  gap: 20px;
+}
+
+.graph-container {
+  width: 400px;
+  height: 300px;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
