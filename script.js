@@ -75,7 +75,7 @@ class Bot {
     );
   }
 
-  energy(x) {
+  updateEnergy(x) {
     this.energy += x;
     if (this.energy > 99) this.energy = 99;
     if (this.energy <= 0) this.dead = 1;
@@ -126,13 +126,13 @@ class Bot {
         this.x = x;
         this.y = y;
         delete resources[key];
-        this.energy(10);
+        this.updateEnergy(10);
       } else if (task > 1 && task <= 4 && resources[key] === 2) {
         delete resources[key];
         addResource(1, x, y);
         this.x = x;
         this.y = y;
-        this.energy(5);
+        this.updateEnergy(5);
       }
     } else if (task > 5 && task <= 7) {
       this.x = x;
@@ -145,12 +145,12 @@ class Bot {
     const command = this.dna[this.dna_cursor];
 
     if (command < 20) {
-      this.energy(-1);
+      this.updateEnergy(-1);
       const task = this.dna[this.dna_cursor + 1] % 10;
       this.look(task);
     } else if (command === 20) {
       this.dna_cursor = this.dna[this.dna_cursor + 1];
-      this.energy(-1);
+      this.updateEnergy(-1);
     }
   }
 }
