@@ -5,7 +5,7 @@ const stats = document.getElementById("stats");
 // Constants
 const BOT_SIZE = 16;
 let FIELD_SIZE = 24;
-let BOTS_NUM = 28;
+let BOTS_NUM = 24;
 let FOOD_LIMIT = 100;
 let POISON_LIMIT = 0;
 let FOOD_GENERATION = 200;
@@ -14,6 +14,9 @@ const DNA_LENGTH = 32;
 const SURVIVORS = 2;
 const MUTATION = 1;
 const MUTATION_DNA = 2;
+const MAX_GENERATIONS = 1;
+const DNA_RUN_LIMIT = 20;
+const LOVE = true;
 
 canvas.width = BOT_SIZE * FIELD_SIZE;
 canvas.height = BOT_SIZE * FIELD_SIZE;
@@ -53,6 +56,9 @@ class Bot {
     this.index = index;
     this.dead = 0;
     this.dna_cursor = 0;
+    this.cannibal = 0;
+    this.DNA_run_count = 0;
+    this.love = null;
   }
 
   show() {
@@ -136,9 +142,40 @@ class Bot {
       this.x = x;
       this.y = y;
     }
+
+    // Add love logic
+    if (task > 4 && task <= 5 && LOVE) {
+      const botAtPosition = bots.find(
+        b => b.x === x && b.y === y && b !== this
+      );
+      if (botAtPosition) {
+        this.x = x;
+        this.y = y;
+        this.updateEnergy(5);
+        this.love = 1;
+        this.mixDNA(botAtPosition.dna);
+        this.color = "pink";
+        this.textColor = "black";
+      }
+    }
+  }
+
+  mixDNA(otherDNA) {
+    for (let i = 0; i < this.dna.length; i++) {
+      if (Math.random() < 0.2) {
+        this.dna[i] = otherDNA[i];
+      }
+    }
   }
 
   runDNA() {
+    this.DNA_run_count++;
+    if (this.DNA_run_count >= DNA_RUN_LIMIT) {
+      this.dna_cursor = 0;
+      this.DNA_run_count = 0;
+      return;
+    }
+
     this.dna_cursor = (this.dna_cursor + 1) % this.dna.length;
     const command = this.dna[this.dna_cursor];
 
@@ -158,6 +195,7 @@ let bots = [];
 let resources = {};
 let generation = 0;
 let timelife = 0;
+let generationLifetimes = [];
 
 function addResource(type, x = null, y = null) {
   x = x ?? Math.floor(Math.random() * FIELD_SIZE);
@@ -196,6 +234,7 @@ function initSimulation() {
   }
   generation = 0;
   timelife = 0;
+  generationLifetimes = [];
 }
 
 function drawGrid() {
@@ -233,6 +272,8 @@ function updateStats() {
 }
 
 function nextGeneration() {
+  generationLifetimes.push(timelife);
+
   const survivors = bots.filter(b => !b.dead).slice(0, SURVIVORS);
   if (survivors.length === 0) {
     initSimulation();
@@ -277,7 +318,19 @@ function nextGeneration() {
   for (let i = 0; i < POISON_LIMIT; i++) {
     addResource(2);
   }
+
+  if (generation >= MAX_GENERATIONS) {
+    endSimulation();
+  }
 }
+
+function endSimulation() {
+  cancelAnimationFrame(animationFrameId);
+  console.log("Simulation ended after", generation, "generations");
+  displayGenerationGraph();
+}
+
+let animationFrameId;
 
 function updateSimulation() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -302,7 +355,13 @@ function updateSimulation() {
     nextGeneration();
   }
 
-  requestAnimationFrame(updateSimulation);
+  animationFrameId = requestAnimationFrame(updateSimulation);
+}
+
+function displayGenerationGraph() {
+  // This is a placeholder for graph generation
+  // You might want to use a library like Chart.js to create an actual graph
+  console.log("Generation Lifetimes:", generationLifetimes);
 }
 
 // Add event listeners for the input fields
@@ -332,4 +391,4 @@ document.getElementById("restartBtn").addEventListener("click", () => {
 });
 
 initSimulation();
-updateSimulation();
+animationFrameId = requestAnimationFrame(updateSimulation);
