@@ -240,6 +240,11 @@ function initSimulation() {
   timelife = 0;
   generationLifetimes = [];
 
+  // Destroy existing chart if it exists
+  if (chart) {
+    chart.destroy();
+  }
+
   // Initialize the chart
   const ctx = document.getElementById("generationGraph").getContext("2d");
   chart = new Chart(ctx, {
@@ -400,8 +405,11 @@ function endSimulation() {
   cancelAnimationFrame(animationFrameId);
   console.log("Simulation ended after", generation, "generations");
 
-  // Update stats one last time
+  // Update stats and chart one last time
   updateStats();
+  if (chart) {
+    chart.update();
+  }
 
   // You might want to add some visual indication that the simulation has ended
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -439,8 +447,10 @@ document.getElementById("maxGenerations").addEventListener("change", e => {
 
 // Add event listener for the restart button
 document.getElementById("restartBtn").addEventListener("click", () => {
+  isSimulationRunning = false;
   cancelAnimationFrame(animationFrameId);
   initSimulation();
+  isSimulationRunning = true;
   animationFrameId = requestAnimationFrame(updateSimulation);
 });
 
