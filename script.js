@@ -9,12 +9,12 @@ let BOTS_NUM = 24;
 let FOOD_LIMIT = 100;
 let POISON_LIMIT = 0;
 let FOOD_GENERATION = 200;
+let MAX_GENERATIONS = 1;
 const DNA_COMMANDS = 32;
 const DNA_LENGTH = 32;
 const SURVIVORS = 2;
 const MUTATION = 1;
 const MUTATION_DNA = 2;
-const MAX_GENERATIONS = 1;
 const DNA_RUN_LIMIT = 20;
 const LOVE = true;
 
@@ -212,6 +212,8 @@ function initSimulation() {
   canvas.width = BOT_SIZE * FIELD_SIZE;
   canvas.height = BOT_SIZE * FIELD_SIZE;
 
+  MAX_GENERATIONS = parseInt(document.getElementById("maxGenerations").value);
+
   bots = [];
   resources = {};
   for (let i = 0; i < BOTS_NUM; i++) {
@@ -357,14 +359,13 @@ function nextGeneration() {
   }
 }
 
-function endSimulation() {
-  cancelAnimationFrame(animationFrameId);
-  console.log("Simulation ended after", generation, "generations");
-}
-
-let animationFrameId;
+let isSimulationRunning = true;
 
 function updateSimulation() {
+  if (!isSimulationRunning) {
+    return;
+  }
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawGrid();
   drawResources();
@@ -387,7 +388,28 @@ function updateSimulation() {
     nextGeneration();
   }
 
-  animationFrameId = requestAnimationFrame(updateSimulation);
+  if (generation < MAX_GENERATIONS) {
+    animationFrameId = requestAnimationFrame(updateSimulation);
+  } else {
+    endSimulation();
+  }
+}
+
+function endSimulation() {
+  isSimulationRunning = false;
+  cancelAnimationFrame(animationFrameId);
+  console.log("Simulation ended after", generation, "generations");
+
+  // Update stats one last time
+  updateStats();
+
+  // You might want to add some visual indication that the simulation has ended
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "white";
+  ctx.font = "24px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("Simulation Ended", canvas.width / 2, canvas.height / 2);
 }
 
 // Add event listeners for the input fields
@@ -411,9 +433,15 @@ document.getElementById("foodGeneration").addEventListener("change", e => {
   FOOD_GENERATION = parseInt(e.target.value);
 });
 
+document.getElementById("maxGenerations").addEventListener("change", e => {
+  MAX_GENERATIONS = parseInt(e.target.value);
+});
+
 // Add event listener for the restart button
 document.getElementById("restartBtn").addEventListener("click", () => {
+  cancelAnimationFrame(animationFrameId);
   initSimulation();
+  animationFrameId = requestAnimationFrame(updateSimulation);
 });
 
 initSimulation();
