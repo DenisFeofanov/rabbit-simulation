@@ -8,6 +8,35 @@
   </head>
   <body>
     <div class="container">
+      <div class="controls">
+        <div class="control-group">
+          <label for="fieldSize">Field Size:</label>
+          <input type="number" id="fieldSize" min="10" max="50" value="24" />
+        </div>
+        <div class="control-group">
+          <label for="botsNum">Number of Bots:</label>
+          <input type="number" id="botsNum" min="1" max="50" value="8" />
+        </div>
+        <div class="control-group">
+          <label for="foodLimit">Food Limit:</label>
+          <input type="number" id="foodLimit" min="0" max="500" value="100" />
+        </div>
+        <div class="control-group">
+          <label for="poisonLimit">Poison Limit:</label>
+          <input type="number" id="poisonLimit" min="0" max="500" value="0" />
+        </div>
+        <div class="control-group">
+          <label for="foodGeneration">Food Generation Rate:</label>
+          <input
+            type="number"
+            id="foodGeneration"
+            min="1"
+            max="1000"
+            value="200"
+          />
+        </div>
+        <button id="restartBtn">Restart Simulation</button>
+      </div>
       <canvas id="simulationCanvas"></canvas>
       <div id="stats"></div>
     </div>

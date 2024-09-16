@@ -4,21 +4,19 @@ const stats = document.getElementById("stats");
 
 // Constants
 const BOT_SIZE = 16;
-const FIELD_SIZE = 24;
-const CANVAS_WIDTH = BOT_SIZE * FIELD_SIZE;
-const CANVAS_HEIGHT = BOT_SIZE * FIELD_SIZE;
+let FIELD_SIZE = 24;
+let BOTS_NUM = 28;
+let FOOD_LIMIT = 100;
+let POISON_LIMIT = 0;
+let FOOD_GENERATION = 200;
 const DNA_COMMANDS = 32;
-const FOOD_LIMIT = 100;
-const POISON_LIMIT = 0;
-const FOOD_GENERATION = 200;
-const BOTS_NUM = 8;
 const DNA_LENGTH = 32;
 const SURVIVORS = 2;
 const MUTATION = 1;
 const MUTATION_DNA = 2;
 
-canvas.width = CANVAS_WIDTH;
-canvas.height = CANVAS_HEIGHT;
+canvas.width = BOT_SIZE * FIELD_SIZE;
+canvas.height = BOT_SIZE * FIELD_SIZE;
 
 // Helper functions
 function drawCircle(x, y, r, fillColor, strokeColor) {
@@ -171,6 +169,9 @@ function addResource(type, x = null, y = null) {
 }
 
 function initSimulation() {
+  canvas.width = BOT_SIZE * FIELD_SIZE;
+  canvas.height = BOT_SIZE * FIELD_SIZE;
+
   bots = [];
   resources = {};
   for (let i = 0; i < BOTS_NUM; i++) {
@@ -193,6 +194,8 @@ function initSimulation() {
   for (let i = 0; i < POISON_LIMIT; i++) {
     addResource(2);
   }
+  generation = 0;
+  timelife = 0;
 }
 
 function drawGrid() {
@@ -200,11 +203,11 @@ function drawGrid() {
   for (let i = 0; i <= FIELD_SIZE; i++) {
     ctx.beginPath();
     ctx.moveTo(0, i * BOT_SIZE);
-    ctx.lineTo(CANVAS_WIDTH, i * BOT_SIZE);
+    ctx.lineTo(canvas.width, i * BOT_SIZE);
     ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(i * BOT_SIZE, 0);
-    ctx.lineTo(i * BOT_SIZE, CANVAS_HEIGHT);
+    ctx.lineTo(i * BOT_SIZE, canvas.height);
     ctx.stroke();
   }
 }
@@ -277,7 +280,7 @@ function nextGeneration() {
 }
 
 function updateSimulation() {
-  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawGrid();
   drawResources();
 
@@ -301,6 +304,32 @@ function updateSimulation() {
 
   requestAnimationFrame(updateSimulation);
 }
+
+// Add event listeners for the input fields
+document.getElementById("fieldSize").addEventListener("change", e => {
+  FIELD_SIZE = parseInt(e.target.value);
+});
+
+document.getElementById("botsNum").addEventListener("change", e => {
+  BOTS_NUM = parseInt(e.target.value);
+});
+
+document.getElementById("foodLimit").addEventListener("change", e => {
+  FOOD_LIMIT = parseInt(e.target.value);
+});
+
+document.getElementById("poisonLimit").addEventListener("change", e => {
+  POISON_LIMIT = parseInt(e.target.value);
+});
+
+document.getElementById("foodGeneration").addEventListener("change", e => {
+  FOOD_GENERATION = parseInt(e.target.value);
+});
+
+// Add event listener for the restart button
+document.getElementById("restartBtn").addEventListener("click", () => {
+  initSimulation();
+});
 
 initSimulation();
 updateSimulation();
